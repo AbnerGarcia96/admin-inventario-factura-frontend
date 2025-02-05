@@ -1,20 +1,46 @@
 import { useState } from "react";
+import CryptoJS from "crypto-js";
+import config from "../config/config.js";
 
 export default function Login() {
-  const [correo, setCorreo] = useState("");
-  const [password, setPassword] = useState("");
+  const [correo, setCorreo] = useState("prueba@gmail.com");
+  const [contrasena, setContrasena] = useState("asd.123");
 
-  function login(e) {
+  async function login(e) {
     e.preventDefault();
-    console.log("Email:", correo, "Password:", password);
-    // Add authentication logic here
+    try {
+      const response = await fetch(
+        `${config.URL_SERVIDOR}/autenticacion/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            correo: correo,
+            contrasena: CryptoJS.SHA256(contrasena).toString(),
+          }),
+        }
+      );
+
+      if (response.status === 401) {
+        alert("Credenciales inválidas");
+      } else {
+        const data = await response.json();
+        alert("Login exitoso");
+      }
+    } catch (error) {
+      console.error("Error no esperado", error);
+    }
   }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center text-gray-800">Login</h2>
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <h2 className="text-2xl font-bold text-center text-gray-800">
+          Iniciar Sesión
+        </h2>
+        <form className="space-y-4" onSubmit={login} noValidate>
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Correo
@@ -30,20 +56,20 @@ export default function Login() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Password
+              Contraseña
             </label>
             <input
               type="password"
               className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={contrasena}
+              onChange={(e) => setContrasena(e.target.value)}
               required
             />
           </div>
           <div className="flex justify-between text-sm">
             <a href="#" className="text-blue-500 hover:underline">
-              Forgot password?
+              ¿Olvidaste tu contraseña?
             </a>
           </div>
           <button
@@ -53,12 +79,6 @@ export default function Login() {
             Login
           </button>
         </form>
-        <p className="text-sm text-center text-gray-600">
-          Don't have an account?{" "}
-          <a href="#" className="text-blue-500 hover:underline">
-            Sign up
-          </a>
-        </p>
       </div>
     </div>
   );
