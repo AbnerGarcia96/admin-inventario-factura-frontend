@@ -1,13 +1,19 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import CryptoJS from "crypto-js";
 import config from "../config/config.js";
+import Input from "../componentes/Input.jsx";
+import Button from "../componentes/Button.jsx";
 
 export default function Login() {
   const [correo, setCorreo] = useState("prueba@gmail.com");
   const [contrasena, setContrasena] = useState("asd.123");
+  const [cargando, setCargando] = useState(false);
+  const navigate = useNavigate();
 
   async function login(e) {
     e.preventDefault();
+    setCargando(true);
     try {
       const response = await fetch(
         `${config.URL_SERVIDOR}/autenticacion/login`,
@@ -22,14 +28,16 @@ export default function Login() {
           }),
         }
       );
+      setCargando(false);
+      const data = await response.json();
 
       if (response.status === 401) {
-        alert("Credenciales inválidas");
+        alert(data.message);
       } else {
-        const data = await response.json();
-        alert("Login exitoso");
+        navigate("/");
       }
     } catch (error) {
+      setCargando(false);
       console.error("Error no esperado", error);
     }
   }
@@ -41,43 +49,36 @@ export default function Login() {
           Iniciar Sesión
         </h2>
         <form className="space-y-4" onSubmit={login} noValidate>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Correo
-            </label>
-            <input
-              type="email"
-              className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your email"
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
-              value={contrasena}
-              onChange={(e) => setContrasena(e.target.value)}
-              required
-            />
-          </div>
+          <Input
+            id="correo"
+            label="Correo"
+            onChange={(e) => setCorreo(e.target.value)}
+            type="email"
+            placeholder="Ingresa tu correo"
+            value={correo}
+            disabled={cargando}
+          />
+          <Input
+            id="contrasena"
+            label="Contraseña"
+            onChange={(e) => setContrasena(e.target.value)}
+            type="password"
+            placeholder="Ingresa tu contraseña"
+            value={contrasena}
+            disabled={cargando}
+          />
           <div className="flex justify-between text-sm">
             <a href="#" className="text-blue-500 hover:underline">
               ¿Olvidaste tu contraseña?
             </a>
           </div>
-          <button
+          <Button
+            clasesCSS="w-full text-white bg-blue-600 rounded-lg hover:bg-blue-700"
             type="submit"
-            className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            disabled={cargando}
           >
             Login
-          </button>
+          </Button>
         </form>
       </div>
     </div>
