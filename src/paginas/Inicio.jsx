@@ -1,5 +1,10 @@
 import { useState } from "react";
+import Layout from "../componentes/Layout";
 
 export default function Inicio() {
-  return <h1>Inicio</h1>;
+  return (
+    <Layout>
+      <h1>Inicio</h1>
+    </Layout>
+  );
 }

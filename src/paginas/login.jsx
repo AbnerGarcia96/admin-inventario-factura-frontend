@@ -27,8 +27,10 @@ export default function Login() {
             contrasena: CryptoJS.SHA256(contrasena).toString(),
           }),
         }
-      );
+      ).catch((error) => alert(error));
+
       setCargando(false);
+
       const data = await response.json();
 
       if (response.status === 401) {

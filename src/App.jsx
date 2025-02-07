@@ -2,6 +2,8 @@ import "./App.css";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import Inicio from "./paginas/Inicio";
 import Login from "./paginas/Login";
+import Facturas from "./paginas/Facturas";
+import Inventario from "./paginas/Inventario";
 
 const router = createBrowserRouter([
   {
@@ -11,6 +13,14 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/facturas",
+    element: <Facturas />,
+  },
+  {
+    path: "/inventario",
+    element: <Inventario />,
   },
 ]);
 
