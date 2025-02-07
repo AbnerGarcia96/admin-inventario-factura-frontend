@@ -1,47 +1,56 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useMutation } from "@tanstack/react-query";
 import CryptoJS from "crypto-js";
 import config from "../config/config.js";
 import Input from "../componentes/Input.jsx";
 import Button from "../componentes/Button.jsx";
+import { Alert } from "../componentes/Alert.jsx";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [correo, setCorreo] = useState("prueba@gmail.com");
   const [contrasena, setContrasena] = useState("asd.123");
-  const [cargando, setCargando] = useState(false);
-  const navigate = useNavigate();
+  const [error, setError] = useState(null);
+  const mutation = useMutation({
+    mutationFn: loginHTTP,
+    onSuccess: exitoHTTP,
+    onError: errorHTTP
+  });
 
-  async function login(e) {
-    e.preventDefault();
-    setCargando(true);
-    try {
-      const response = await fetch(
-        `${config.URL_SERVIDOR}/autenticacion/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            correo: correo,
-            contrasena: CryptoJS.SHA256(contrasena).toString(),
-          }),
-        }
-      ).catch((error) => alert(error));
-
-      setCargando(false);
-
-      const data = await response.json();
-
-      if (response.status === 401) {
-        alert(data.message);
-      } else {
-        navigate("/");
+  function loginHTTP(credenciales) {
+    return fetch(
+      `${config.URL_SERVIDOR}/autenticacion/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credenciales)
       }
-    } catch (error) {
-      setCargando(false);
-      console.error("Error no esperado", error);
+    )
+  }
+  
+  async function exitoHTTP(respuesta){
+    const data = await respuesta.json();
+    if (respuesta.status === 401) {
+      setError(data.message);
+    } else {
+      localStorage.setItem("usuarioActivo", JSON.stringify(data));
+      navigate("/");
     }
+  }
+  
+  function errorHTTP(){
+    setError("Error al comunicarse con el servidor");
+  }
+
+  function login(e){
+    e.preventDefault();
+    mutation.mutate({
+      correo: correo,
+      contrasena: CryptoJS.SHA256(contrasena).toString(),
+    });
   }
 
   return (
@@ -58,7 +67,7 @@ export default function Login() {
             type="email"
             placeholder="Ingresa tu correo"
             value={correo}
-            disabled={cargando}
+            disabled={mutation.isPending}
           />
           <Input
             id="contrasena"
@@ -67,7 +76,7 @@ export default function Login() {
             type="password"
             placeholder="Ingresa tu contraseña"
             value={contrasena}
-            disabled={cargando}
+            disabled={mutation.isPending}
           />
           <div className="flex justify-between text-sm">
             <a href="#" className="text-blue-500 hover:underline">
@@ -77,10 +86,11 @@ export default function Login() {
           <Button
             clasesCSS="w-full text-white bg-blue-600 rounded-lg hover:bg-blue-700"
             type="submit"
-            disabled={cargando}
-          >
+            disabled={mutation.isPending}
+            >
             Login
           </Button>
+          {error && <Alert tipo="error">{error}</Alert>}
         </form>
       </div>
     </div>

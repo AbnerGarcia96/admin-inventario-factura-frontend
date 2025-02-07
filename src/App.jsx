@@ -4,7 +4,9 @@ import Inicio from "./paginas/Inicio";
 import Login from "./paginas/Login";
 import Facturas from "./paginas/Facturas";
 import Inventario from "./paginas/Inventario";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
     path: "",
@@ -25,7 +27,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return <QueryClientProvider client={queryClient}><RouterProvider router={router} /></QueryClientProvider>
 }
 
 export default App;
