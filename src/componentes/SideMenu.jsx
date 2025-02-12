@@ -21,7 +21,7 @@ const modulos = [
 export default function SideMenu() {
   return (
     <aside className="w-64 bg-blue-600 text-white p-5 flex flex-col space-y-4">
-      <h2 className="text-2xl font-bold">Dashboard</h2>
+      <h2 className="text-2xl font-bold">Menú</h2>
       <nav>
         <ul className="space-y-2">
           {modulos.map((m) => {

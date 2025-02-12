@@ -1,5 +1,3 @@
-const config = {
-  URL_SERVIDOR: "http://localhost:3000",
-};
+export const URL_SERVIDOR = "http://localhost:3000";
 
-export default config;
+export const MAX_POCAS_EXISTENCIAS = 3;

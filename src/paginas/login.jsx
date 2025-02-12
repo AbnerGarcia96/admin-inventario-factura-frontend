@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import CryptoJS from "crypto-js";
-import config from "../config/config.js";
+import { URL_SERVIDOR } from "../config/config.js";
 import Input from "../componentes/Input.jsx";
 import Button from "../componentes/Button.jsx";
 import { Alert } from "../componentes/Alert.jsx";
@@ -15,23 +15,20 @@ export default function Login() {
   const mutation = useMutation({
     mutationFn: loginHTTP,
     onSuccess: exitoHTTP,
-    onError: errorHTTP
+    onError: errorHTTP,
   });
 
   function loginHTTP(credenciales) {
-    return fetch(
-      `${config.URL_SERVIDOR}/autenticacion/login`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credenciales)
-      }
-    )
+    return fetch(`${URL_SERVIDOR}/autenticacion/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credenciales),
+    });
   }
-  
-  async function exitoHTTP(respuesta){
+
+  async function exitoHTTP(respuesta) {
     const data = await respuesta.json();
     if (respuesta.status === 401) {
       setError(data.message);
@@ -40,12 +37,12 @@ export default function Login() {
       navigate("/");
     }
   }
-  
-  function errorHTTP(){
+
+  function errorHTTP() {
     setError("Error al comunicarse con el servidor");
   }
 
-  function login(e){
+  function login(e) {
     e.preventDefault();
     mutation.mutate({
       correo: correo,
@@ -87,7 +84,7 @@ export default function Login() {
             clasesCSS="w-full text-white bg-blue-600 rounded-lg hover:bg-blue-700"
             type="submit"
             disabled={mutation.isPending}
-            >
+          >
             Login
           </Button>
           {error && <Alert tipo="error">{error}</Alert>}

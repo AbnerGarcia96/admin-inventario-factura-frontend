@@ -5,6 +5,25 @@ import Login from "./paginas/Login";
 import Facturas from "./paginas/Facturas";
 import Inventario from "./paginas/Inventario";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Colors,
+} from "chart.js";
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Colors
+);
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
