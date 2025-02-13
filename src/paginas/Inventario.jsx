@@ -2,44 +2,68 @@ import Layout from "../componentes/Layout";
 import { useQuery } from "@tanstack/react-query";
 import { obtenerInventarioSucursal } from "../utils/sucursales.http";
 import Card from "../componentes/Card";
-import { MAX_POCAS_EXISTENCIAS } from "../config/config";
-import { moneda } from "../utils/formato.js";
+import { formatear } from "../utils/formato.js";
 import { Bar } from "react-chartjs-2";
+import Table from "../componentes/Table.jsx";
+import {
+  MAX_POCAS_EXISTENCIAS,
+  FORMATO,
+  configuracionGraficoInventario,
+} from "../config/config";
 
-let configuracionGrafico = {
-  data: {
-    labels: ["En Existencia", "Bajo en Existencia", "Sin Existencia"],
-    datasets: [],
+const configuracionGrafico = configuracionGraficoInventario;
+const configuracionColumnas = [
+  {
+    id: "nombre",
+    titulo: "Nombre",
+    formato: FORMATO.TEXTO,
+    default: "No definido",
   },
-  options: {
-    indexAxis: "y",
-    plugins: { legend: { display: false } },
-    scales: {
-      x: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          display: false,
-        },
-        border: {
-          display: false,
-        },
-      },
-      y: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          display: true,
-        },
-        border: {
-          display: false,
-        },
-      },
+  {
+    id: "marca",
+    titulo: "Marca",
+    formato: FORMATO.TEXTO,
+    default: "No definido",
+  },
+  {
+    id: "descripcion",
+    titulo: "Descripción",
+    formato: FORMATO.TEXTO,
+    default: "No definido",
+  },
+  {
+    id: "precio",
+    titulo: "Precio unitario",
+    formato: FORMATO.MONEDA,
+    default: "No definido",
+  },
+  {
+    id: "cantidad",
+    titulo: "Cantidad",
+    formato: FORMATO.NUMERO,
+    default: "No definido",
+  },
+  {
+    id: "modificado",
+    titulo: "Última modificación",
+    formato: FORMATO.FECHA_LARGA,
+    default: "Sin actualizaciones",
+  },
+];
+const acciones = [
+  {
+    nombre: "Detalles",
+    accion: (e) => {
+      console.log("Detalles", e);
     },
   },
-};
+  {
+    nombre: "Editar",
+    accion: (e) => {
+      console.log("EDITAR", e);
+    },
+  },
+];
 
 export default function Inventario() {
   const { data, isPending, isError, error } = useQuery({
@@ -49,12 +73,13 @@ export default function Inventario() {
   let valorInventario = "";
 
   if (data) {
-    valorInventario = moneda.format(
+    valorInventario = formatear(
       data.reduce(
         (acumulador, valorActual) =>
           acumulador + valorActual.precio * valorActual.cantidad,
         0
-      )
+      ),
+      FORMATO.MONEDA
     );
     configuracionGrafico.data.datasets = [
       {
@@ -98,56 +123,11 @@ export default function Inventario() {
       {isPending && <p>Cargando...</p>}
       {!isPending && (
         <div className="flex items-center justify-center">
-          <table className="w-full text-sm text-left rtl:text-right">
-            <thead className="text-xs uppercase">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  Nombre
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Marca
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Descripción
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Precio unitario
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Cantidad
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Última modificación
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((producto) => {
-                return (
-                  <tr key={producto.idProducto} className="border-gray-200">
-                    <td className="px-6 py-4">{producto.nombre}</td>
-                    <td className="px-6 py-4">{producto.marca}</td>
-                    <td className="px-6 py-4">{producto.descripcion}</td>
-                    <td className="px-6 py-4">
-                      {moneda.format(producto.precio)}
-                    </td>
-                    <td className="px-6 py-4">{producto.cantidad}</td>
-                    <td className="px-6 py-4">
-                      {producto.modificado
-                        ? producto.modificado
-                        : "Sin modificar"}
-                    </td>
-                    <td>
-                      <button>Detalles</button>|<button>Editar</button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <Table
+            columnas={configuracionColumnas}
+            datos={data}
+            acciones={acciones}
+          ></Table>
         </div>
       )}
     </Layout>
