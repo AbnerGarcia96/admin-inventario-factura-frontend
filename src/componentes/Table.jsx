@@ -99,8 +99,14 @@ export default function Table({ columnas, datos, acciones = [] }) {
               {acciones.length > 0 && (
                 <td>
                   {acciones.map((a) => (
-                    <Button key={a.nombre} onClick={a.accion}>
-                      {a.nombre}
+                    <Button
+                      key={a.nombre}
+                      title={a.nombre}
+                      onClick={a.accion}
+                      clasesCSS={`mx-1 rounded text-white ${a.color}`}
+                    >
+                      {a.icono && a.icono}
+                      {!a.icono && a.nombre}
                     </Button>
                   ))}
                 </td>

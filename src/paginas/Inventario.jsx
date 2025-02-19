@@ -10,6 +10,7 @@ import {
   FORMATO,
   configuracionGraficoInventario,
 } from "../config/config";
+import { Eye, Pen } from "lucide-react";
 
 const configuracionGrafico = configuracionGraficoInventario;
 const configuracionColumnas = [
@@ -53,12 +54,16 @@ const configuracionColumnas = [
 const acciones = [
   {
     nombre: "Detalles",
+    icono: <Eye size={15} />,
+    color: "bg-blue-600",
     accion: (e) => {
       console.log("Detalles", e);
     },
   },
   {
     nombre: "Editar",
+    icono: <Pen size="15" />,
+    color: "bg-gray-600",
     accion: (e) => {
       console.log("EDITAR", e);
     },
