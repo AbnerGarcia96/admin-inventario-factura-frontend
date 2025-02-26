@@ -5,12 +5,15 @@ import Card from "../componentes/Card";
 import { formatear } from "../utils/formato.js";
 import { Bar } from "react-chartjs-2";
 import Table from "../componentes/Table.jsx";
+import Input from "../componentes/Input.jsx";
+
 import {
   MAX_POCAS_EXISTENCIAS,
   FORMATO,
   configuracionGraficoInventario,
 } from "../config/config";
 import { Eye, Pen } from "lucide-react";
+import { useState } from "react";
 
 const configuracionGrafico = configuracionGraficoInventario;
 const configuracionColumnas = [
@@ -75,7 +78,18 @@ export default function Inventario() {
     queryKey: ["inventario"],
     queryFn: obtenerInventarioSucursal,
   });
+  const [filtro, setFiltro] = useState({
+    nombre: "",
+    marca: "",
+    descripcion: "",
+  });
   let valorInventario = "";
+
+  function actualizarFiltro(llave, valor) {
+    setFiltro((filtroActual) => {
+      return { ...filtroActual, [llave]: valor };
+    });
+  }
 
   if (data) {
     valorInventario = formatear(
@@ -101,39 +115,73 @@ export default function Inventario() {
       },
     ];
   }
+
   return (
     <Layout>
-      {!isPending && (
-        <div className="flex items-center justify-center mb-3">
-          <div className="w-1/5 flex-auto">
-            <Card titulo={valorInventario}>Valor total del inventario</Card>
-          </div>
-          <div className="w-3/5 flex-auto">
-            <Card>
-              <Bar
-                data={configuracionGrafico.data}
-                height={"40px"}
-                options={configuracionGrafico.options}
-              />
-            </Card>
-          </div>
-          <div className="w-1/5 flex-auto">
-            <select name="" id="">
-              <option value="">Sucursal principal</option>
-            </select>
-          </div>
-        </div>
-      )}
-
       {isPending && <p>Cargando...</p>}
+
       {!isPending && (
-        <div className="flex items-center justify-center">
-          <Table
-            columnas={configuracionColumnas}
-            datos={data}
-            acciones={acciones}
-          ></Table>
-        </div>
+        <>
+          <div className="flex items-center justify-center mb-3">
+            <div className="w-1/5 flex-auto">
+              <Card titulo={valorInventario}>Valor total del inventario</Card>
+            </div>
+            <div className="w-3/5 flex-auto">
+              <Card>
+                <Bar
+                  data={configuracionGrafico.data}
+                  height={"25px"}
+                  options={configuracionGrafico.options}
+                />
+              </Card>
+            </div>
+            <div className="w-1/5 flex-auto">
+              <select name="" id="">
+                <option value="">Sucursal principal</option>
+              </select>
+            </div>
+          </div>
+          <div className="flex items-center justify-center mb-5 gap-5">
+            <Input
+              id="nombre"
+              label="Nombre"
+              onChange={(e) => {
+                actualizarFiltro("nombre", e.target.value);
+              }}
+              type="text"
+              placeholder="Nombre"
+              value={filtro.nombre}
+            />
+            <Input
+              id="marca"
+              label="Marca"
+              onChange={(e) => {
+                actualizarFiltro("marca", e.target.value);
+              }}
+              type="text"
+              placeholder="Marca"
+              value={filtro.marca}
+            />
+            <Input
+              id="descripcion"
+              label="Descripción"
+              onChange={(e) => {
+                actualizarFiltro("descripcion", e.target.value);
+              }}
+              type="text"
+              placeholder="Descripción"
+              value={filtro.descripcion}
+            />
+          </div>
+          <div className="flex items-center justify-center">
+            <Table
+              columnas={configuracionColumnas}
+              datos={data}
+              acciones={acciones}
+              filtro={filtro}
+            ></Table>
+          </div>
+        </>
       )}
     </Layout>
   );

@@ -8,7 +8,12 @@ import {
 } from "lucide-react";
 import Button from "./Button.jsx";
 
-export default function Table({ columnas, datos, acciones = [] }) {
+export default function Table({
+  columnas,
+  datos,
+  filtro = null,
+  acciones = [],
+}) {
   let datosTabla = [...datos];
   const [ordenar, setOrdenar] = useState({ columna: "", orden: "" });
 
@@ -58,63 +63,73 @@ export default function Table({ columnas, datos, acciones = [] }) {
     datosTabla = [...datos];
   }
 
+  if (filtro) {
+    for (const [llave, valor] of Object.entries(filtro)) {
+      datosTabla = datosTabla.filter((fila) =>
+        fila[llave].toLowerCase().includes(valor.toLowerCase())
+      ); // Actualmente solo functiona para columnas que sean STRING
+    }
+  }
+
   return (
-    <table className="w-full text-sm text-left">
-      <thead className="text-xs">
-        <tr>
-          {columnas.map((columna) => (
-            <th
-              key={columna.titulo}
-              scope="col"
-              className="px-6 py-3"
-              onClick={() => cambiarOrden(columna)}
-            >
-              <Button className="flex items-center gap-2 uppercase">
-                {columna.titulo}
-                {ordenar.orden === "" && <ArrowUpDown size="15" />}
-                {ordenar.orden === "ASC" && <ArrowUpWideNarrow size="15" />}
-                {ordenar.orden === "DESC" && <ArrowUpNarrowWide size="15" />}
-              </Button>
-            </th>
-          ))}
-          {acciones.length > 0 && (
-            <th scope="col" className="px-6 py-3">
-              ACCIONES
-            </th>
-          )}
-        </tr>
-      </thead>
-      <tbody>
-        {datosTabla.map((producto) => {
-          const contenido = columnas.map((columna) => (
-            <td key={columna.id} className="px-6 py-4">
-              {producto[columna.id]
-                ? formatear(producto[columna.id], columna.formato)
-                : columna.default}
-            </td>
-          ));
-          return (
-            <tr key={producto.idProducto} className="border-gray-200">
-              {contenido}
-              {acciones.length > 0 && (
-                <td>
-                  {acciones.map((a) => (
-                    <Button
-                      key={a.nombre}
-                      title={a.nombre}
-                      onClick={a.accion}
-                      clasesCSS={`mx-1 rounded text-white ${a.color}`}
-                    >
-                      {a.icono && a.icono}
-                      {!a.icono && a.nombre}
-                    </Button>
-                  ))}
-                </td>
-              )}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+    <>
+      <table className="w-full text-sm text-left">
+        <thead className="text-xs">
+          <tr>
+            {columnas.map((columna) => (
+              <th
+                key={columna.titulo}
+                scope="col"
+                className="px-6 py-3"
+                onClick={() => cambiarOrden(columna)}
+              >
+                <Button className="flex items-center gap-2 uppercase">
+                  {columna.titulo}
+                  {ordenar.orden === "" && <ArrowUpDown size="15" />}
+                  {ordenar.orden === "ASC" && <ArrowUpWideNarrow size="15" />}
+                  {ordenar.orden === "DESC" && <ArrowUpNarrowWide size="15" />}
+                </Button>
+              </th>
+            ))}
+            {acciones.length > 0 && (
+              <th scope="col" className="px-6 py-3">
+                ACCIONES
+              </th>
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {datosTabla.map((producto) => {
+            const contenido = columnas.map((columna) => (
+              <td key={columna.id} className="px-6 py-4">
+                {producto[columna.id]
+                  ? formatear(producto[columna.id], columna.formato)
+                  : columna.default}
+              </td>
+            ));
+            return (
+              <tr key={producto.idProducto} className="border-gray-200">
+                {contenido}
+                {acciones.length > 0 && (
+                  <td>
+                    {acciones.map((a) => (
+                      <Button
+                        key={a.nombre}
+                        title={a.nombre}
+                        onClick={a.accion}
+                        clasesCSS={`mx-1 rounded text-white ${a.color}`}
+                      >
+                        {a.icono && a.icono}
+                        {!a.icono && a.nombre}
+                      </Button>
+                    ))}
+                  </td>
+                )}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </>
   );
 }
