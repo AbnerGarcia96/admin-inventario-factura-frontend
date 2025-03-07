@@ -15,6 +15,7 @@ import {
   Legend,
   Colors,
 } from "chart.js";
+import DetalleProducto from "./paginas/DetalleProducto";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -42,6 +43,15 @@ const router = createBrowserRouter([
   {
     path: "/inventario",
     element: <Inventario />,
+  },
+  {
+    path: "/producto",
+    children: [
+      {
+        path: ":id",
+        element: <DetalleProducto />,
+      },
+    ],
   },
 ]);
 

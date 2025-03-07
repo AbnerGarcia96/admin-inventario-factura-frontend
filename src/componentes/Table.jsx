@@ -116,7 +116,7 @@ export default function Table({
                       <Button
                         key={a.nombre}
                         title={a.nombre}
-                        onClick={a.accion}
+                        onClick={(e) => a.accion(e, producto)}
                         clasesCSS={`mx-1 rounded text-white ${a.color}`}
                       >
                         {a.icono && a.icono}

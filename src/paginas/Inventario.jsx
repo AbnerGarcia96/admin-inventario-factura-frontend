@@ -14,6 +14,7 @@ import {
 } from "../config/config";
 import { Eye, Pen } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const configuracionGrafico = configuracionGraficoInventario;
 const configuracionColumnas = [
@@ -54,26 +55,28 @@ const configuracionColumnas = [
     default: "Sin actualizaciones",
   },
 ];
-const acciones = [
-  {
-    nombre: "Detalles",
-    icono: <Eye size={15} />,
-    color: "bg-blue-600",
-    accion: (e) => {
-      console.log("Detalles", e);
-    },
-  },
-  {
-    nombre: "Editar",
-    icono: <Pen size="15" />,
-    color: "bg-gray-600",
-    accion: (e) => {
-      console.log("EDITAR", e);
-    },
-  },
-];
 
 export default function Inventario() {
+  const navegar = useNavigate();
+  const acciones = [
+    {
+      nombre: "Detalles",
+      icono: <Eye size={15} />,
+      color: "bg-blue-600",
+      accion: (e, producto) => {
+        console.log("Detalles", e, producto);
+        navegar(`/producto/${producto.idProducto}`);
+      },
+    },
+    {
+      nombre: "Editar",
+      icono: <Pen size="15" />,
+      color: "bg-gray-600",
+      accion: (e) => {
+        console.log("EDITAR", e);
+      },
+    },
+  ];
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["inventario"],
     queryFn: obtenerInventarioSucursal,
